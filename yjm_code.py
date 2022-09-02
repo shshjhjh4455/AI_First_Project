@@ -2,7 +2,9 @@ import pandas as pd
 import numpy as np
 from datetime import timedelta
 from datetime import datetime
+import matplotlib.pyplot as plt
 
+''' 전처리
 df1 = pd.read_csv('C:/Users/opqrs/OneDrive/바탕 화면/data1.csv',encoding='cp949',header=None)
 
 # 소비유형 공백제거 
@@ -28,3 +30,15 @@ df1 = df1.drop(['지역코드_소비유형코드'],axis=1) # 변환 후 날짜 �
 df1=df1.set_index('날짜')
 
 df1.to_csv('C:/Users/opqrs/OneDrive/바탕 화면/data.csv',encoding='cp949')
+'''
+
+# 
+df = pd.read_csv('C:/Users/opqrs/OneDrive/바탕 화면/customer_payment_data.csv',encoding='cp949',header=None)
+df.columns = df.iloc[0,:]
+df = df.drop([0],axis=0)
+df = df.set_index('날짜')
+df = df.astype('float')
+
+df[df.columns[ pd.Series(df.columns).str.startswith('전국')]]
+plt.plot( df['2010/01':'2010/12']['전국_합계'] ,marker='o',markersize=3)
+
