@@ -3,13 +3,14 @@ import numpy as np
 from datetime import timedelta
 from datetime import datetime
 import os
-currentPath =os.getcwd()
-
-print(currentPath)
-os.chdir(currentPath)
-files =os.chdir(currentPath)
 
 df1 = pd.read_csv('/Users/bagjeonghyeon/AI_First_Project/AI_First_Project/data/customer_payment_data.csv',header=None)
+
+df1.columns = df1.iloc[0,:]
+df1 = df1.drop([0],axis=0)
+df1 = df1.set_index('날짜')
+df1 = df1.astype('float')
+
 
 # 소비유형 공백제거 
 df1.iloc[1,:] = [df1.iloc[1,:][i].replace(" ","") for i in range(len(df1.columns))]
@@ -33,5 +34,5 @@ df1 = df1.drop(['지역코드_소비유형코드'],axis=1) # 변환 후 날짜 �
 # set index
 df1=df1.set_index('날짜')
 
-df1.to_csv('C:/Users/opqrs/OneDrive/바탕 화면/data.csv',encoding='cp949')
+df1.to_csv('data.csv',encoding='cp949')
 
