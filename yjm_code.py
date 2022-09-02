@@ -3,6 +3,12 @@ import numpy as np
 from datetime import timedelta
 from datetime import datetime
 import matplotlib.pyplot as plt
+import seaborn as sns
+
+from matplotlib import font_manager, rc
+font_name = font_manager.FontProperties(fname="c:/Windows/Fonts/malgun.ttf").get_name()
+rc('font', family=font_name)
+
 
 ''' 전처리
 df1 = pd.read_csv('C:/Users/opqrs/OneDrive/바탕 화면/data1.csv',encoding='cp949',header=None)
@@ -33,12 +39,61 @@ df1.to_csv('C:/Users/opqrs/OneDrive/바탕 화면/data.csv',encoding='cp949')
 '''
 
 # 
-df = pd.read_csv('C:/Users/opqrs/OneDrive/바탕 화면/customer_payment_data.csv',encoding='cp949',header=None)
+df1 = pd.read_csv('C:/Users/opqrs/OneDrive/바탕 화면/customer_payment_data.csv',encoding='cp949',header=None)
+df = df1
 df.columns = df.iloc[0,:]
 df = df.drop([0],axis=0)
 df = df.set_index('날짜')
 df = df.astype('float')
 
+# 분기 열로 넣기
+df = df.reset_index()
+df.insert(0, 'year',  df.apply(lambda row: row['날짜'].split('/')[0], axis=1))
+df.insert(0, 'month', df.apply(lambda row: row['날짜'].split('/')[1], axis=1))
+df = df.set_index('날짜')
+# df = df['2017/07':'2022/05']
+'''
+# 지역별로 추출
 df[df.columns[ pd.Series(df.columns).str.startswith('전국')]]
-plt.plot( df['2010/01':'2010/12']['전국_합계'] ,marker='o',markersize=3)
+df = df[df.columns[ pd.Series(df.columns).str.contains('서울')]]
+'''
 
+#
+df.insert(2,'periods','periods')
+df['2017/07':'2019/12'].iloc[:,2] = 'Pre'
+df['2020/01':'2022/05'].iloc[:,2] = 'With'
+#########################################################################################################################################
+
+df=df.groupby('periods').mean()
+df=df[df.columns[ pd.Series(df.columns).str.contains('서울')]]
+
+
+for i in range(1,41):
+    plt.plot( df.iloc[:,i] ,marker='o',markersize=3)
+    
+    
+    
+df = df.reset_index()
+    
+
+
+
+'''
+df = df.drop('index',axis=1)
+df2=df.set_index('periods').T
+
+plt.tight_layout()
+df2[1:].plot.bar(rot=90)
+'''
+
+
+''' 상승률 
+df2=df.groupby('year').sum()
+for i in range(0,12):
+    for j in range(0,738):
+        df2.iloc[i,j] = df2.iloc[i+1,j]/df2.iloc[i,j]    
+
+df3=df2.shift(1)
+
+df3.to_excel('C:/Users/opqrs/OneDrive/바탕 화면/상승률.xlsx')
+'''
