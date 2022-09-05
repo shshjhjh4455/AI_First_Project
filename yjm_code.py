@@ -101,8 +101,9 @@ df3.to_excel('C:/Users/opqrs/OneDrive/바탕 화면/상승률.xlsx')
 
 
 ### 연령별인구현황
-import os
 
+'''
+import os
 path = "C:/Users/opqrs/Downloads/연령별인구현황"
 file_list = os.listdir(path)
 
@@ -113,8 +114,14 @@ for i in range(0,16):
     c = pd.concat([c,b],axis=1)
 
 del a, b
-
 c.to_excel('C:/Users/opqrs/OneDrive/바탕 화면/인구통계.xlsx')
+'''
 
+# 인구통계 엑셀로 전처리한 데이터 로드
+df = pd.read_csv('C:/Users/opqrs/OneDrive/바탕 화면/population.csv',encoding='cp949')
 
-price_covid_corr_df = price_covid.groupby(['Date']).corr(method='pearson').reset_index()
+a = df.groupby(['year','age']).sum()
+a = a.reset_index()
+plt.bar(a.age,a.서울)
+
+sns.barplot()
