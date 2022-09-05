@@ -1,25 +1,23 @@
+import requests
+import csv
+import seaborn as sns
+import datetime as dt
+from tqdm import tqdm
+import matplotlib.ticker as ticker
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import datetime
+import warnings
 from IPython.core.display import display, HTML
 display(HTML("<style>.container {width:90% !important;}</style>"))
 
-import warnings
 warnings.filterwarnings(action='ignore')
 # import pandas_datareader.data as web
 # import FinanceDataReader as fdr
 
-import datetime
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 # import mpl_finance
-import matplotlib.ticker as ticker
-from tqdm import tqdm
 
-import csv, requests
-import datetime
-import pandas as pd
-import numpy as np
-import datetime as dt
-import matplotlib.pyplot as plt
 
 CSV_URL = 'https://raw.githubusercontent.com/jooeungen/coronaboard_kr/master/kr_regional_daily.csv'
 
@@ -68,50 +66,66 @@ with requests.Session() as s:
 
         csv_data.append(row)
 
-covid_df = pd.DataFrame(csv_data, columns = ['date','region','confirmed','death','released'])
-covid_df.to_csv('covid19_korea.csv', index=False, header=False, encoding='utf8')
+covid_df = pd.DataFrame(
+    csv_data, columns=['date', 'region', 'confirmed', 'death', 'released'])
+covid_df.to_csv('covid19_korea.csv', index=False,
+                header=False, encoding='utf8')
 
 print(covid_df.head())
 
-## 전체지역 확진자수 그룹바이
-total_covid_df = covid_df.groupby(['date'])['confirmed'].sum().reset_index(name='counts')
+# 전체지역 확진자수 그룹바이
+total_covid_df = covid_df.groupby(
+    ['date'])['confirmed'].sum().reset_index(name='counts')
 
-total_covid_df = total_covid_df.rename(columns={'date':'Date'})
+total_covid_df = total_covid_df.rename(columns={'date': 'Date'})
 total_covid_df['Date'] = total_covid_df['Date'].astype(str)
 
 print(total_covid_df.head())
 
-## Date 데이터타입 변경
-total_covid_df['Date'] = total_covid_df['Date'].apply(lambda x: datetime.datetime.strptime(x,"%Y%m%d")) 
+# Date 데이터타입 변경
+total_covid_df['Date'] = total_covid_df['Date'].apply(
+    lambda x: datetime.datetime.strptime(x, "%Y%m%d"))
 
+print(total_covid_df.head())
+
+# 일간 데이터 월간 데이터로 변환
+total_covid_df = total_covid_df.groupby(
+    total_covid_df['Date'].dt.strftime('%Y-%m')).sum()
 print(total_covid_df.head())
 
 csv_data = pd.read_csv(
     '/Users/bagjeonghyeon/Downloads/price_total.csv', header=None)
+
 
 # 행 열 설정
 csv_data.columns = ['Date', 'Price']
 csv_data['Date'] = csv_data['Date'].astype(str)
 # chage . to -
 #csv_data['Date'] = csv_data['Date'].str.replace('.', '-')
-total_covid_df['Date'] = total_covid_df['Date'].astype(str)
-print (csv_data.head())
+#total_covid_df['Date'] = total_covid_df['Date'].astype(str)
+print(csv_data.head())
 
 
-price_covid = pd.merge(csv_data, total_covid_df, on='Date').reset_index(drop=True)
-price_covid['datatime'] = price_covid['Date'].apply(lambda x: datetime.datetime.strptime(x,"%Y%m%d"))
+price_covid = pd.merge(csv_data, total_covid_df,
+                       on='Date').reset_index(drop=True)
+price_covid['datetime'] = price_covid['Date'].apply(
+    lambda x: datetime.datetime.strptime(x, "%Y-%m"))
 price_covid['Price'] = price_covid['Price'].astype(int)
 
-# make plot using price_covid 
-fig = plt.figure()
-ax = fig.add_subplot(1,1,1)
+print(price_covid.head())
 
-# x 축에 datetime, y 축에 Price
-ax.plot(price_covid['datatime'], price_covid['Price'], label='Price')
-
-# 그래프 그리기
+# datetime 열 버리기
+price_covid = price_covid.drop('datetime', axis=1)
+print(price_covid)
 
 
-    
+# 확진자와 소비량 상관곤계 분석
+price_covid_corr_df = price_covid.groupby(['Date']).corr(method='pearson').reset_index()
+print(price_covid_corr_df)
 
 
+sns.set(font_scale=1.5)
+f, ax = plt.subplots(figsize=(20, 10))
+sns.heatmap(price_covid_corr_df, annot=True, fmt='.2f',
+            linewidths=.5, cmap='Blues', ax=ax)
+sns.heatmap
