@@ -88,9 +88,9 @@ total_covid_df['Date'] = total_covid_df['Date'].apply(
 
 print(total_covid_df.head())
 
-# 일간 데이터 월간 데이터로 변환
+# 일간 데이터 연간 데이터로 변환
 total_covid_df = total_covid_df.groupby(
-    total_covid_df['Date'].dt.strftime('%Y-%m')).sum()
+    total_covid_df['Date'].dt.strftime('%Y')).sum()
 print(total_covid_df.head())
 
 csv_data = pd.read_csv(
@@ -99,17 +99,16 @@ csv_data = pd.read_csv(
 
 # 행 열 설정
 csv_data.columns = ['Date', 'Price']
-csv_data['Date'] = csv_data['Date'].astype(str)
-# chage . to -
-#csv_data['Date'] = csv_data['Date'].str.replace('.', '-')
-#total_covid_df['Date'] = total_covid_df['Date'].astype(str)
+csv_data = pd.to_datetime(csv_data['Date'], format='%Y').sum()
+csv_data = csv_data.groupby(csv_data['Date'].dt.strftime('%Y')).sum() # 연도별로 그룹화 !!오류
+
 print(csv_data.head())
 
 
 price_covid = pd.merge(csv_data, total_covid_df,
                        on='Date').reset_index(drop=True)
 price_covid['datetime'] = price_covid['Date'].apply(
-    lambda x: datetime.datetime.strptime(x, "%Y-%m"))
+    lambda x: datetime.datetime.strptime(x, "%Y"))
 price_covid['Price'] = price_covid['Price'].astype(int)
 
 print(price_covid.head())
