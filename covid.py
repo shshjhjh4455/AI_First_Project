@@ -13,7 +13,7 @@ from IPython.core.display import display, HTML
 display(HTML("<style>.container {width:90% !important;}</style>"))
 
 warnings.filterwarnings(action='ignore')
-# import pandas_datareader.data as web
+#import pandas_datareader.data as web
 # import FinanceDataReader as fdr
 
 # import mpl_finance
@@ -121,6 +121,9 @@ print(price_covid.head())
 
 # csv 파일로 저장
 price_covid.to_csv('price_covid.csv')
+
+# 전체기간 확진자와 소비량 상관관계 분석
+print(price_covid.corr())
 
 # 2020 확진자와 소비량 상관관계 분석
 price_covid_corr_df = price_covid[price_covid.datetime.dt.year == 2020].reset_index(
