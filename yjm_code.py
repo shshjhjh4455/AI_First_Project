@@ -6,8 +6,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 from matplotlib import font_manager, rc
-font_name = font_manager.FontProperties(fname="c:/Windows/Fonts/malgun.ttf").get_name()
-rc('font', family=font_name)
+rc('font', family=font_manager.FontProperties(fname="c:/Windows/Fonts/malgun.ttf").get_name())
 
 
 ''' 전처리
@@ -63,20 +62,10 @@ df.insert(2,'periods','periods')
 df['2017/07':'2019/12'].iloc[:,2] = 'Pre'
 df['2020/01':'2022/05'].iloc[:,2] = 'With'
 #########################################################################################################################################
-
+'''
 df=df.groupby('periods').mean()
 df=df[df.columns[ pd.Series(df.columns).str.contains('서울')]]
-
-
-for i in range(1,41):
-    plt.plot( df.iloc[:,i] ,marker='o',markersize=3)
-    
-    
-    
-df['2010/01':'2022/05']['전국_합계'].plot()
-df['2020/03':'2022/05']['전국_합계'].plot()
-    
-
+''' 
 
 '''
 df = df.drop('index',axis=1)
@@ -120,8 +109,105 @@ c.to_excel('C:/Users/opqrs/OneDrive/바탕 화면/인구통계.xlsx')
 # 인구통계 엑셀로 전처리한 데이터 로드
 df = pd.read_csv('C:/Users/opqrs/OneDrive/바탕 화면/population.csv',encoding='cp949')
 
-a = df.groupby(['year','age']).sum()
+a = df.groupby(['year','age','gender']).sum()
 a = a.reset_index()
-plt.bar(a.age,a.서울)
+a = a.set_index('age')
+a = a.drop(['연령구간인구수','총인구수'])
+a = a.set_index('gender')
+a = a.drop(['계'])
+a = a.reset_index()
 
-sns.barplot()
+# sns.color_palette("Paired", 9)
+# sns.color_palette("Set3", 10)
+# sns.color_palette("bright")
+sns.set_palette(sns.color_palette("Set3", 10))
+
+# 연도별 / 지역별 / 연령대 
+for i in range(3,18):
+    plt.figure(figsize=(15,15))
+    sns.barplot(data=a,
+                x='age',
+                y=a.columns[i],
+                hue='year')
+    plt.xlabel('Age',fontsize=20)
+    plt.xticks(fontsize=20, rotation=45)
+    plt.yticks(fontsize=20)
+    plt.ylabel(a.columns[i],fontsize=20)
+    plt.legend(loc='best',fontsize=20 )
+    plt.savefig('C:/Users/opqrs/OneDrive/바탕 화면/'+a.columns[i]+'png')
+
+# 연도별 / 성비
+for i in range(3,18):
+    plt.figure(figsize=(15,15))
+    sns.barplot(data=a,
+                x='year',
+                y=a.columns[i],
+                hue='gender',
+                ci=None)
+    plt.xlabel('gender',fontsize=20)
+    plt.xticks(fontsize=20, rotation=45)
+    plt.yticks(fontsize=20)
+    plt.ylabel(a.columns[i],fontsize=20)
+    plt.legend(loc='best',fontsize=20 )
+
+##
+plt.style.use('ggplot')
+plt.figure(figsize=(10,5),dpi=300)
+plt.barh(range(101), , label='남성')
+a[a['gender']=='남']['서울']
+
+df = pd.read_csv('C:/Users/opqrs/OneDrive/바탕 화면/population.csv',encoding='cp949')
+a = df.groupby(['year','age','gender']).sum()
+a = a.reset_index()
+a = a.set_index('age')
+a = a.drop(['연령구간인구수','총인구수'])
+a = a.reset_index()
+a = a.set_index('gender')
+a = a.drop(['계'])
+a = a.reset_index()
+
+
+
+plt.style.use('ggplot')
+plt.figure(figsize=(10,5),dpi=300)
+plt.rc('font',family = 'Malgun Gothic')
+plt.rcParams['axes.unicode_minus'] = False
+plt.barh(a.loc[(a['gender']=='남') & (a['year']==2017) ]['age'],
+         -a.loc[(a['gender']=='남') & (a['year']==2017) ]['서울'] , 
+         label='남성')
+
+plt.barh(a.loc[(a['gender']=='여') & (a['year']==2017) ]['age'],
+         a.loc[(a['gender']=='여') & (a['year']==2017) ]['서울'] , 
+         label='여성')
+plt.xticks([-a.loc[(a['gender']=='남') & (a['year']==2017) ]['서울'].max(),
+            -a.loc[(a['gender']=='남') & (a['year']==2017) ]['서울'].median(),
+            0,
+            a.loc[(a['gender']=='여') & (a['year']==2017) ]['서울'].median(),
+            a.loc[(a['gender']=='여') & (a['year']==2017) ]['서울'].max(),
+            ],
+           label=[(a.loc[(a['gender']=='남') & (a['year']==2017) ]['서울'].max()),
+                     str(a.loc[(a['gender']=='남') & (a['year']==2017) ]['서울'].median()),
+                     str(0),
+                     str(a.loc[(a['gender']=='남') & (a['year']==2017) ]['서울'].median()),
+                     str(a.loc[(a['gender']=='남') & (a['year']==2017) ]['서울'].max()),
+                     ])
+
+
+
+plt.legend()
+
+
+a.loc[(a['gender']=='남') & (a['year']==2017) ]['서울'].max()
+
+plt.barh(age, , label='남성')
+a.loc[(a['gender']=='남') & (a['year']==2017) ][ ['age','서울']]
+
+
+
+a=pd.read_csv('C:/Users/opqrs/OneDrive/바탕 화면/price_covid.csv')
+a['year'] = a['Date'].dt.year(0)
+
+import datetime
+a['Date'].dt.year()
+a['year'] = pd.to_datetime(a['Date']).dt.strftime('%Y')
+a.groupby('year').sum()
