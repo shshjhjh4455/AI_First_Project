@@ -115,7 +115,6 @@ price_covid['Price'] = price_covid['Price'].astype(int)
 print(price_covid.head())
 
 
-
 # datetime 열 버리기
 # price_covid = price_covid.drop('datetime', axis=1)
 # print(price_covid)
@@ -124,13 +123,19 @@ print(price_covid.head())
 price_covid.to_csv('price_covid.csv')
 
 # 2020 확진자와 소비량 상관관계 분석
-price_covid_corr_df = price_covid[price_covid.datetime.dt.year == 2020].reset_index()
+price_covid_corr_df = price_covid[price_covid.datetime.dt.year == 2020].reset_index(
+)
+price_covid_corr_df.drop('index', axis=1, inplace=True)
 print(price_covid_corr_df.corr())
 
 # 2021 확진자와 소비량 상관관계 분석
-price_covid_corr_df = price_covid[price_covid.datetime.dt.year == 2021].reset_index()
+price_covid_corr_df = price_covid[price_covid.datetime.dt.year == 2021].reset_index(
+)
+price_covid_corr_df.drop('index', axis=1, inplace=True)
 print(price_covid_corr_df.corr())
 
 # 2022 확진자와 소비량 상관관계 분석
-price_covid_corr_df = price_covid[price_covid.datetime.dt.year == 2022].reset_index()
+price_covid_corr_df = price_covid[price_covid.datetime.dt.year == 2022].reset_index(
+)
+price_covid_corr_df.drop('index', axis=1, inplace=True)
 print(price_covid_corr_df.corr())
