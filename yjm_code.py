@@ -39,7 +39,7 @@ df1.to_csv('C:/Users/opqrs/OneDrive/바탕 화면/data.csv',encoding='cp949')
 '''
 
 # 
-df1 = pd.read_csv('C:/Users/opqrs/OneDrive/바탕 화면/customer_payment_data.csv',encoding='cp949',header=None)
+df1 = pd.read_csv("C:/Users/opqrs/OneDrive/문서/GitHub/AI_First_Project/customer_payment_data.csv",encoding='cp949',header=None)
 df = df1
 df.columns = df.iloc[0,:]
 df = df.drop([0],axis=0)
@@ -73,9 +73,9 @@ for i in range(1,41):
     
     
     
-df = df.reset_index()
+df['2010/01':'2022/05']['전국_합계'].plot()
+df['2020/03':'2022/05']['전국_합계'].plot()
     
-
 
 
 '''
@@ -97,3 +97,24 @@ df3=df2.shift(1)
 
 df3.to_excel('C:/Users/opqrs/OneDrive/바탕 화면/상승률.xlsx')
 '''
+
+
+
+### 연령별인구현황
+import os
+
+path = "C:/Users/opqrs/Downloads/연령별인구현황"
+file_list = os.listdir(path)
+
+c = pd.DataFrame()
+for i in range(0,16):
+    a = pd.read_csv("C:/Users/opqrs/Downloads/연령별인구현황/201712_202112_연령별인구현황_연간 ("+str(i)+").csv",encoding='cp949')
+    b = a.iloc[0,:]
+    c = pd.concat([c,b],axis=1)
+
+del a, b
+
+c.to_excel('C:/Users/opqrs/OneDrive/바탕 화면/인구통계.xlsx')
+
+
+price_covid_corr_df = price_covid.groupby(['Date']).corr(method='pearson').reset_index()

@@ -69,7 +69,7 @@ with requests.Session() as s:
         csv_data.append(row)
 
 covid_df = pd.DataFrame(csv_data, columns = ['date','region','confirmed','death','released'])
-covid_df.to_csv('covid19_korea.csv', index=False, header=False, encoding='utf8')
+# covid_df.to_csv('covid19_korea.csv', index=False, header=False, encoding='utf8')
 
 print(covid_df.head())
 
@@ -86,19 +86,21 @@ total_covid_df['Date'] = total_covid_df['Date'].apply(lambda x: datetime.datetim
 
 print(total_covid_df.head())
 
-csv_data = pd.read_csv(
-    '/Users/bagjeonghyeon/Downloads/price_total.csv', header=None)
+csv_data = pd.read_csv(  ## 경로 변경 필요!!
+    "C:/Users/opqrs/OneDrive/문서/GitHub/AI_First_Project/price_total.csv", header=None)
 
 # 행 열 설정
 csv_data.columns = ['Date', 'Price']
 csv_data['Date'] = csv_data['Date'].astype(str)
 # chage . to -
-#csv_data['Date'] = csv_data['Date'].str.replace('.', '-')
+csv_data['Date'] = csv_data['Date'].str.replace('.', '-')
 total_covid_df['Date'] = total_covid_df['Date'].astype(str)
 print (csv_data.head())
 
 
-price_covid = pd.merge(csv_data, total_covid_df, on='Date').reset_index(drop=True)
+price_covid = csv_data.join(total_covid_df, how='outer', on='Date')
+
+pd.merge(csv_data, total_covid_df, on='Date')
 price_covid['datatime'] = price_covid['Date'].apply(lambda x: datetime.datetime.strptime(x,"%Y%m%d"))
 price_covid['Price'] = price_covid['Price'].astype(int)
 
