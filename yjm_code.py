@@ -31,8 +31,11 @@ df1.insert(0, '날짜', df1['지역코드_소비유형코드'].apply(lambda _: d
 # 분기 열로 넣기
 df1 = df1.drop(['지역코드_소비유형코드'],axis=1) # 변환 후 날짜 삭제
 
-# set index
-df1=df1.set_index('날짜')
+# 분기 열로 넣기
+df1 = df1.reset_index()
+df1.insert(0, 'year',  df1.apply(lambda row: row['날짜'].split('/')[0], axis=1))
+df1.insert(0, 'month', df1.apply(lambda row: row['날짜'].split('/')[1], axis=1))
+df1 = df.set_index('날짜')
 
 df1.to_csv('C:/Users/opqrs/OneDrive/바탕 화면/data.csv',encoding='cp949')
 '''
@@ -150,13 +153,10 @@ for i in range(3,18):
     plt.ylabel(a.columns[i],fontsize=20)
     plt.legend(loc='best',fontsize=20 )
 
-##
-plt.style.use('ggplot')
-plt.figure(figsize=(10,5),dpi=300)
-plt.barh(range(101), , label='남성')
-a[a['gender']=='남']['서울']
 
-df = pd.read_csv('C:/Users/opqrs/OneDrive/바탕 화면/population.csv',encoding='cp949')
+
+## 연도별 / 지역별 성비
+df = pd.read_csv('C:/Users/opqrs/OneDrive/문서/GitHub/AI_First_Project/population.csv',encoding='cp949')
 a = df.groupby(['year','age','gender']).sum()
 a = a.reset_index()
 a = a.set_index('age')
@@ -166,48 +166,68 @@ a = a.set_index('gender')
 a = a.drop(['계'])
 a = a.reset_index()
 
+## 
+year=2021
+for i in range(3,19):
+    plt.style.use('ggplot')
+    plt.figure(figsize=(9,5),dpi=300)
+    plt.tight_layout()
+    plt.rc('font',family = 'Malgun Gothic')
+    plt.rcParams['axes.unicode_minus'] = False
+    plt.barh(a.loc[(a['gender']=='남') & (a['year']==year) ]['age'],
+             -a.loc[(a['gender']=='남') & (a['year']==year) ][a.columns[i]] , label='남성')
+    
+    plt.barh(a.loc[(a['gender']=='여') & (a['year']==year) ]['age'],
+             a.loc[(a['gender']=='여') & (a['year']==year) ][a.columns[i]] , label='여성')
+    
+    plt.title(str(year)+'년 '+a.columns[i]+'지역 연령별 성비')
+    
+    # text
+    male=pd.concat([a.loc[(a['gender']=='남') & (a['year']==year) ]['age'],
+               a.loc[(a['gender']=='남') & (a['year']==year) ][a.columns[i]]
+               ],axis=1).reset_index().drop('index',axis=1)
 
+    female=pd.concat([a.loc[(a['gender']=='여') & (a['year']==year) ]['age'],
+               a.loc[(a['gender']=='여') & (a['year']==year) ][a.columns[i]]
+               ],axis=1).reset_index().drop('index',axis=1)
 
-plt.style.use('ggplot')
-plt.figure(figsize=(10,5),dpi=300)
-plt.rc('font',family = 'Malgun Gothic')
-plt.rcParams['axes.unicode_minus'] = False
-plt.barh(a.loc[(a['gender']=='남') & (a['year']==2017) ]['age'],
-         -a.loc[(a['gender']=='남') & (a['year']==2017) ]['서울'] , 
-         label='남성')
+    plt.text(0,9.8,'('+'{0:,}'.format(male[a.columns[i]][10])+'명) '+str(round(round(male[a.columns[i]][10]/(male[a.columns[i]][10]+female[a.columns[i]][10]),3)*100,2))+'%' +'  '+ str(round(round(female[a.columns[i]][10]/(male[a.columns[i]][10]+female[a.columns[i]][10]),3)*100,2))+'%'+' ('+'{0:,}'.format(female[a.columns[i]][10])+'명)'
+  ,color='black',horizontalalignment='center', fontsize=6)
+    
+    plt.text(0,8.8,'('+'{0:,}'.format(male[a.columns[i]][9])+'명) '+str(round(round(male[a.columns[i]][9]/(male[a.columns[i]][9]+female[a.columns[i]][9]),3)*100,2))+'%' +'  '+ str(round(round(female[a.columns[i]][9]/(male[a.columns[i]][9]+female[a.columns[i]][9]),3)*100,2))+'%'+' ('+'{0:,}'.format(female[a.columns[i]][9])+'명)'
+  ,color='black',horizontalalignment='center', fontsize=6)
+    
+    plt.text(0,7.8,'('+'{0:,}'.format(male[a.columns[i]][8])+'명) '+str(round(round(male[a.columns[i]][8]/(male[a.columns[i]][8]+female[a.columns[i]][8]),3)*100,2))+'%' +'  '+ str(round(round(female[a.columns[i]][8]/(male[a.columns[i]][8]+female[a.columns[i]][8]),3)*100,2))+'%'+' ('+'{0:,}'.format(female[a.columns[i]][8])+'명)'
+  ,color='black',horizontalalignment='center', fontsize=6)
+    
+    plt.text(0,6.8,'('+'{0:,}'.format(male[a.columns[i]][7])+'명) '+str(round(round(male[a.columns[i]][7]/(male[a.columns[i]][7]+female[a.columns[i]][7]),3)*100,2))+'%' +'  '+ str(round(round(female[a.columns[i]][7]/(male[a.columns[i]][7]+female[a.columns[i]][7]),3)*100,2))+'%'+' ('+'{0:,}'.format(female[a.columns[i]][7])+'명)'
+  ,color='black',horizontalalignment='center', fontsize=6)
+    
+    plt.text(0,5.8,'('+'{0:,}'.format(male[a.columns[i]][6])+'명) '+str(round(round(male[a.columns[i]][6]/(male[a.columns[i]][6]+female[a.columns[i]][6]),3)*100,2))+'%' +'  '+ str(round(round(female[a.columns[i]][6]/(male[a.columns[i]][6]+female[a.columns[i]][6]),3)*100,2))+'%'+' ('+'{0:,}'.format(female[a.columns[i]][6])+'명)'
+  ,color='black',horizontalalignment='center', fontsize=6)
+    
+    plt.text(0,4.8,'('+'{0:,}'.format(male[a.columns[i]][5])+'명) '+str(round(round(male[a.columns[i]][5]/(male[a.columns[i]][5]+female[a.columns[i]][5]),3)*100,2))+'%' +'  '+ str(round(round(female[a.columns[i]][5]/(male[a.columns[i]][5]+female[a.columns[i]][5]),3)*100,2))+'%'+' ('+'{0:,}'.format(female[a.columns[i]][5])+'명)'
+  ,color='black',horizontalalignment='center', fontsize=6)
+    
+    plt.text(0,3.8,'('+'{0:,}'.format(male[a.columns[i]][4])+'명) '+str(round(round(male[a.columns[i]][4]/(male[a.columns[i]][4]+female[a.columns[i]][4]),3)*100,2))+'%' +'  '+ str(round(round(female[a.columns[i]][4]/(male[a.columns[i]][4]+female[a.columns[i]][4]),3)*100,2))+'%'+' ('+'{0:,}'.format(female[a.columns[i]][4])+'명)'
+  ,color='black',horizontalalignment='center', fontsize=6)
+    
+    plt.text(0,2.8,'('+'{0:,}'.format(male[a.columns[i]][3])+'명) '+str(round(round(male[a.columns[i]][3]/(male[a.columns[i]][3]+female[a.columns[i]][3]),3)*100,2))+'%' +'  '+ str(round(round(female[a.columns[i]][3]/(male[a.columns[i]][3]+female[a.columns[i]][3]),3)*100,2))+'%'+' ('+'{0:,}'.format(female[a.columns[i]][3])+'명)'
+  ,color='black',horizontalalignment='center', fontsize=6)
+    
+    plt.text(0,1.8,'('+'{0:,}'.format(male[a.columns[i]][2])+'명) '+str(round(round(male[a.columns[i]][2]/(male[a.columns[i]][2]+female[a.columns[i]][2]),3)*100,2))+'%' +'  '+ str(round(round(female[a.columns[i]][2]/(male[a.columns[i]][2]+female[a.columns[i]][2]),3)*100,2))+'%'+' ('+'{0:,}'.format(female[a.columns[i]][2])+'명)'
+  ,color='black',horizontalalignment='center', fontsize=6)
+    
+    plt.text(0,0.8,'('+'{0:,}'.format(male[a.columns[i]][1])+'명) '+str(round(round(male[a.columns[i]][1]/(male[a.columns[i]][1]+female[a.columns[i]][1]),3)*100,2))+'%' +'  '+ str(round(round(female[a.columns[i]][1]/(male[a.columns[i]][1]+female[a.columns[i]][1]),3)*100,2))+'%'+' ('+'{0:,}'.format(female[a.columns[i]][1])+'명)'
+  ,color='black',horizontalalignment='center', fontsize=6)
+    
+    plt.text(0,-0.2,'('+'{0:,}'.format(male[a.columns[i]][0])+'명) '+str(round(round(male[a.columns[i]][0]/(male[a.columns[i]][0]+female[a.columns[i]][0]),3)*100,2))+'%' +'  '+ str(round(round(female[a.columns[i]][0]/(male[a.columns[i]][0]+female[a.columns[i]][0]),3)*100,2))+'%'+' ('+'{0:,}'.format(female[a.columns[i]][0])+'명)'
+ ,color='black',horizontalalignment='center', fontsize=6)
+    
+    plt.xticks(color='w')
+    plt.tick_params(axis='x',direction='in',length=0)
 
-plt.barh(a.loc[(a['gender']=='여') & (a['year']==2017) ]['age'],
-         a.loc[(a['gender']=='여') & (a['year']==2017) ]['서울'] , 
-         label='여성')
-plt.xticks([-a.loc[(a['gender']=='남') & (a['year']==2017) ]['서울'].max(),
-            -a.loc[(a['gender']=='남') & (a['year']==2017) ]['서울'].median(),
-            0,
-            a.loc[(a['gender']=='여') & (a['year']==2017) ]['서울'].median(),
-            a.loc[(a['gender']=='여') & (a['year']==2017) ]['서울'].max(),
-            ],
-           label=[(a.loc[(a['gender']=='남') & (a['year']==2017) ]['서울'].max()),
-                     str(a.loc[(a['gender']=='남') & (a['year']==2017) ]['서울'].median()),
-                     str(0),
-                     str(a.loc[(a['gender']=='남') & (a['year']==2017) ]['서울'].median()),
-                     str(a.loc[(a['gender']=='남') & (a['year']==2017) ]['서울'].max()),
-                     ])
+    
+    plt.savefig('C:/Users/opqrs/OneDrive/문서/GitHub/AI_First_Project/지역_연령별_성비/'+str(year)+'년 '+a.columns[i])
+###
 
-
-
-plt.legend()
-
-
-a.loc[(a['gender']=='남') & (a['year']==2017) ]['서울'].max()
-
-plt.barh(age, , label='남성')
-a.loc[(a['gender']=='남') & (a['year']==2017) ][ ['age','서울']]
-
-
-
-a=pd.read_csv('C:/Users/opqrs/OneDrive/바탕 화면/price_covid.csv')
-a['year'] = a['Date'].dt.year(0)
-
-import datetime
-a['Date'].dt.year()
-a['year'] = pd.to_datetime(a['Date']).dt.strftime('%Y')
-a.groupby('year').sum()
