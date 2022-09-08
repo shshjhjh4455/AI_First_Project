@@ -93,29 +93,15 @@ corona_csv.to_csv('covid19_korea_race.csv', index=False, header=False, encoding=
 
 #필요한 데이터만 남기고 지우기
 corona = corona_csv[['date','confirmed','region']] # 등록일시분초, 확진자 수, 시도명(영어)
-#print(corona.head(19))
 
 #열 순서 바꾸기 (등록일시, 시도명, 확진자 수 순)
 corona = corona[['date','region','confirmed']]
-#print(corona.head(19))
-
-# 필요없는 데이터 지우기(검역Lazaretto, 토탈Total)
-# condition = (corona.region != 'Lazaretto') & (corona.region !='Total')
-# corona = corona[condition]
-# print(corona.head(17))
 
 # 검역 열 지우기
 corona.drop(corona[corona['region'] == '검역'].index, inplace=True)
 
-# 열값을 지역(gubunEn)으로, 값을 확진자 수(defCnt)로 하여 피봇팅하기
+# 열값을 지역으로, 값을 확진자 수로 하여 피봇팅하기
 corona_df = corona.pivot_table(values = 'confirmed', index = ['date'], columns='region')
-
-#nan값 있는지 확인 True이면 null값이 있음
-#print(pd.isnull(corona_df))
-
-# NaN값을 0으로 바꾸어 주기
-# corona_df.fillna(0,inplace=True)
-#print(corona_df.head())
 
 # 확진자 수 누적값으로 만들어주기
 corona_df.iloc[:,0:-1] = corona_df.iloc[:,0:-1].cumsum()
